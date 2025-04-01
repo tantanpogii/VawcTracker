@@ -56,8 +56,8 @@ export default function Cases() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-  const [barangayFilter, setBarangayFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [barangayFilter, setBarangayFilter] = useState("all");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [caseToDelete, setCaseToDelete] = useState<Case | null>(null);
@@ -134,10 +134,10 @@ export default function Cases() {
           caseItem.perpetratorName.toLowerCase().includes(searchQuery.toLowerCase());
         
         // Status filter
-        const statusMatch = statusFilter === "" || caseItem.status === statusFilter;
+        const statusMatch = statusFilter === "all" || caseItem.status === statusFilter;
         
         // Barangay filter
-        const barangayMatch = barangayFilter === "" || caseItem.barangay === barangayFilter;
+        const barangayMatch = barangayFilter === "all" || caseItem.barangay === barangayFilter;
         
         return searchMatch && statusMatch && barangayMatch;
       })
@@ -172,8 +172,8 @@ export default function Cases() {
   // Reset filters
   const resetFilters = () => {
     setSearchQuery("");
-    setStatusFilter("");
-    setBarangayFilter("");
+    setStatusFilter("all");
+    setBarangayFilter("all");
     setSortConfig(null);
   };
 
@@ -217,7 +217,7 @@ export default function Cases() {
                 <SelectValue placeholder="All Statuses" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Statuses</SelectItem>
+                <SelectItem value="all">All Statuses</SelectItem>
                 <SelectItem value="active">Active</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="closed">Closed</SelectItem>
@@ -231,7 +231,7 @@ export default function Cases() {
                 <SelectValue placeholder="All Barangays" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Barangays</SelectItem>
+                <SelectItem value="all">All Barangays</SelectItem>
                 {barangays.map((barangay) => (
                   <SelectItem key={barangay} value={barangay}>
                     {barangay}
