@@ -42,11 +42,11 @@ export default function Navbar() {
           {/* Logo & Brand */}
           <div className="flex items-center">
             <Link href="/">
-              <a className="flex items-center">
+              <div className="flex items-center cursor-pointer">
                 <ShieldAlert className="h-6 w-6 mr-2" />
                 <span className="font-bold text-lg hidden sm:inline">VAWC Case Management System</span>
                 <span className="font-bold text-lg sm:hidden">VAWC CMS</span>
-              </a>
+              </div>
             </Link>
           </div>
 
