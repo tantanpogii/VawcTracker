@@ -84,16 +84,36 @@ export type InsertCase = z.infer<typeof insertCaseSchema>;
 export type Case = typeof cases.$inferSelect;
 
 // Form schema for case creation/editing with services
-export const caseFormSchema = insertCaseSchema.extend({
-  services: z.array(
-    z.object({
-      type: z.string(),
-      selected: z.boolean()
-    })
-  ),
-  otherServices: z.string().optional(),
-  caseNotes: z.string().optional()
-});
+// We need to accept date as string or Date object
+const dateSchema = z.union([
+  z.string().refine((date) => !isNaN(new Date(date).getTime()), {
+    message: "Invalid date string",
+  }),
+  z.date()
+]);
+
+export const caseFormSchema = insertCaseSchema
+  .omit({ incidentDate: true }) // Remove the strict Date field
+  .extend({
+    incidentDate: dateSchema, // Replace with our flexible date schema
+    services: z.array(
+      z.object({
+        type: z.string(),
+        selected: z.boolean()
+      })
+    ),
+    otherServices: z.string().optional(),
+    caseNotes: z.string().optional()
+  })
+  .transform((data) => {
+    // For API use, always convert to Date object
+    return {
+      ...data,
+      incidentDate: data.incidentDate instanceof Date 
+        ? data.incidentDate 
+        : new Date(data.incidentDate),
+    };
+  });
 
 export type CaseFormData = z.infer<typeof caseFormSchema>;
 

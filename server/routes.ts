@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { DBStorage } from "./db-storage";
 import jwt from "jsonwebtoken";
-import { loginSchema, insertCaseSchema } from "@shared/schema";
+import { loginSchema, insertCaseSchema, caseFormSchema } from "@shared/schema";
 import session from "express-session";
 import MemoryStore from "memorystore";
 import bcrypt from "bcrypt";
@@ -216,46 +216,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.post("/api/cases", authenticateToken, async (req: Request, res: Response) => {
     try {
-      // Validate case data
-      const validationResult = insertCaseSchema.safeParse(req.body);
-      
-      if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: "Validation error", 
-          errors: validationResult.error.errors 
-        });
-      }
-      
-      // Create the case
-      const newCase = await dbStorage.createCase(validationResult.data);
-      
-      // Add services if provided
-      if (req.body.services) {
-        const serviceTypes = req.body.services
-          .filter((s: { type: string, selected: boolean }) => s.selected)
-          .map((s: { type: string }) => s.type);
-          
-        for (const type of serviceTypes) {
-          await dbStorage.addService({
-            type,
-            dateProvided: new Date(),
-            provider: req.body.encoderName,
+      // For creating cases, we'll use the raw request body and manually validate
+      try {
+        // Required fields validation
+        if (!req.body.victimName || typeof req.body.victimName !== 'string') {
+          return res.status(400).json({ message: "Victim name is required and must be a string" });
+        }
+        
+        if (!req.body.incidentType || typeof req.body.incidentType !== 'string') {
+          return res.status(400).json({ message: "Incident type is required and must be a string" });
+        }
+        
+        if (!req.body.perpetratorName || typeof req.body.perpetratorName !== 'string') {
+          return res.status(400).json({ message: "Perpetrator name is required and must be a string" });
+        }
+        
+        if (!req.body.encoderName || typeof req.body.encoderName !== 'string') {
+          return res.status(400).json({ message: "Encoder name is required and must be a string" });
+        }
+        
+        if (!req.body.status || !['active', 'pending', 'closed'].includes(req.body.status)) {
+          return res.status(400).json({ message: "Status is required and must be one of: active, pending, closed" });
+        }
+        
+        // Handle date conversion
+        const caseData: any = { ...req.body };
+        delete caseData.services;
+        delete caseData.otherServices;
+        delete caseData.caseNotes;
+        
+        // Convert incident date if it's a string
+        if (!caseData.incidentDate) {
+          return res.status(400).json({ message: "Incident date is required" });
+        }
+        
+        if (typeof caseData.incidentDate === 'string') {
+          try {
+            caseData.incidentDate = new Date(caseData.incidentDate);
+            if (isNaN(caseData.incidentDate.getTime())) {
+              throw new Error("Invalid date format");
+            }
+          } catch (dateError) {
+            return res.status(400).json({ message: "Invalid incident date format" });
+          }
+        }
+        
+        // Create the case
+        const newCase = await dbStorage.createCase(caseData);
+        
+        // Add services if provided
+        if (req.body.services) {
+          const serviceTypes = req.body.services
+            .filter((s: { type: string, selected: boolean }) => s.selected)
+            .map((s: { type: string }) => s.type);
+            
+          for (const type of serviceTypes) {
+            await dbStorage.addService({
+              type,
+              dateProvided: new Date(),
+              provider: req.body.encoderName,
+              caseId: newCase.id
+            });
+          }
+        }
+        
+        // Add initial note if provided
+        if (req.body.caseNotes) {
+          await dbStorage.addNote({
+            content: req.body.caseNotes,
+            authorId: req.user.id,
             caseId: newCase.id
           });
         }
-      }
-      
-      // Add initial note if provided
-      if (req.body.caseNotes) {
-        await dbStorage.addNote({
-          content: req.body.caseNotes,
-          authorId: req.user.id,
-          caseId: newCase.id
+        
+        return res.status(201).json(newCase);
+      } catch (validationError) {
+        return res.status(400).json({
+          message: "Validation error",
+          error: (validationError as Error).message
         });
       }
-      
-      return res.status(201).json(newCase);
-      
     } catch (error) {
       console.error("Create case error:", error);
       return res.status(500).json({ message: "Internal server error" });
@@ -270,25 +310,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid case ID" });
       }
       
-      // Validate case data
-      const validationResult = insertCaseSchema.partial().safeParse(req.body);
-      
-      if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: "Validation error", 
-          errors: validationResult.error.errors 
+      // For updates, we'll use the raw request body and manually validate required fields
+      // This avoids issues with the transformed schema
+      try {
+        // Basic validation of critical fields if they exist in the payload
+        if (req.body.victimName !== undefined && typeof req.body.victimName !== 'string') {
+          return res.status(400).json({ message: "Victim name must be a string" });
+        }
+        
+        if (req.body.incidentType !== undefined && typeof req.body.incidentType !== 'string') {
+          return res.status(400).json({ message: "Incident type must be a string" });
+        }
+        
+        if (req.body.perpetratorName !== undefined && typeof req.body.perpetratorName !== 'string') {
+          return res.status(400).json({ message: "Perpetrator name must be a string" });
+        }
+        
+        if (req.body.status !== undefined && !['active', 'pending', 'closed'].includes(req.body.status)) {
+          return res.status(400).json({ message: "Status must be one of: active, pending, closed" });
+        }
+        
+        // Handle date conversion if needed
+        const caseData: any = { ...req.body };
+        delete caseData.services;
+        delete caseData.otherServices;
+        delete caseData.caseNotes;
+        
+        // Convert incident date if it's a string
+        if (caseData.incidentDate && typeof caseData.incidentDate === 'string') {
+          caseData.incidentDate = new Date(caseData.incidentDate);
+        }
+        
+        // Update the case
+        const updatedCase = await dbStorage.updateCase(caseId, caseData);
+        
+        if (!updatedCase) {
+          return res.status(404).json({ message: "Case not found" });
+        }
+        
+        // Update services if provided
+        if (req.body.services) {
+          const serviceTypes = req.body.services
+            .filter((s: { type: string, selected: boolean }) => s.selected)
+            .map((s: { type: string }) => s.type);
+            
+          // First get existing services to avoid duplicates
+          const existingServices = await dbStorage.getCaseServices(caseId);
+          const existingTypes = existingServices.map(s => s.type);
+          
+          // Add new services
+          for (const type of serviceTypes) {
+            if (!existingTypes.includes(type)) {
+              await dbStorage.addService({
+                type,
+                dateProvided: new Date(),
+                provider: req.body.encoderName || updatedCase.encoderName,
+                caseId
+              });
+            }
+          }
+        }
+        
+        // Add new note if provided
+        if (req.body.caseNotes) {
+          await dbStorage.addNote({
+            content: req.body.caseNotes,
+            authorId: req.user.id,
+            caseId
+          });
+        }
+        
+        return res.json(updatedCase);
+      } catch (validationError) {
+        return res.status(400).json({
+          message: "Validation error",
+          error: (validationError as Error).message
         });
       }
-      
-      // Update the case
-      const updatedCase = await dbStorage.updateCase(caseId, validationResult.data);
-      
-      if (!updatedCase) {
-        return res.status(404).json({ message: "Case not found" });
-      }
-      
-      return res.json(updatedCase);
-      
     } catch (error) {
       console.error("Update case error:", error);
       return res.status(500).json({ message: "Internal server error" });
