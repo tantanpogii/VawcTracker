@@ -4,6 +4,7 @@ import { Case } from "@shared/schema";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { formatDate } from "@/lib/utils/case-utils";
+import RoleRestricted from "@/components/layout/role-restricted";
 
 import { 
   Card, 
@@ -167,59 +168,64 @@ export default function Reports() {
 
   if (isLoading) {
     return (
-      <div className="container py-6">
-        <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <BarChart3 className="h-6 w-6 text-primary" />
+      <RoleRestricted allowedRoles={["administrator"]}>
+        <div className="container py-6">
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <BarChart3 className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold">Reports</h1>
+              <p className="text-muted-foreground">
+                View and generate VAWC case reports
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold">Reports</h1>
-            <p className="text-muted-foreground">
-              View and generate VAWC case reports
-            </p>
+          <div className="mt-6 grid gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <Card key={i} className="animate-pulse">
+                <CardHeader className="bg-muted/30">
+                  <div className="h-6 w-24 bg-muted rounded" />
+                </CardHeader>
+                <CardContent className="pt-6 pb-10">
+                  <div className="h-48 bg-muted/50 rounded-md flex items-center justify-center">
+                    <BarChart3 className="h-12 w-12 text-muted-foreground/40" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
-        <div className="mt-6 grid gap-6">
-          {[1, 2, 3, 4].map((i) => (
-            <Card key={i} className="animate-pulse">
-              <CardHeader className="bg-muted/30">
-                <div className="h-6 w-24 bg-muted rounded" />
-              </CardHeader>
-              <CardContent className="pt-6 pb-10">
-                <div className="h-48 bg-muted/50 rounded-md flex items-center justify-center">
-                  <BarChart3 className="h-12 w-12 text-muted-foreground/40" />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
+      </RoleRestricted>
     );
   }
 
   if (isError) {
     return (
-      <div className="container py-6">
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-10">
-            <div className="text-destructive mb-4">
-              <AlertTriangle size={64} />
-            </div>
-            <h2 className="text-2xl font-bold mb-2">Error Loading Reports</h2>
-            <p className="text-muted-foreground mb-4">
-              Unable to load report data. Please try again later.
-            </p>
-            <Button onClick={() => window.location.reload()}>
-              Retry
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+      <RoleRestricted allowedRoles={["administrator"]}>
+        <div className="container py-6">
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-10">
+              <div className="text-destructive mb-4">
+                <AlertTriangle size={64} />
+              </div>
+              <h2 className="text-2xl font-bold mb-2">Error Loading Reports</h2>
+              <p className="text-muted-foreground mb-4">
+                Unable to load report data. Please try again later.
+              </p>
+              <Button onClick={() => window.location.reload()}>
+                Retry
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </RoleRestricted>
     );
   }
 
   return (
-    <div className="container py-6">
+    <RoleRestricted allowedRoles={["administrator"]}>
+      <div className="container py-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
         <div className="flex items-center space-x-4">
@@ -502,5 +508,6 @@ export default function Reports() {
         </TabsContent>
       </Tabs>
     </div>
+    </RoleRestricted>
   );
 }

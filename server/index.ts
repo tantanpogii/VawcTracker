@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { setupDatabase } from "./setup";
+import { recreateDatabase } from "./recreate-db";
 
 const app = express();
 app.use(express.json());
@@ -42,7 +43,8 @@ app.use((req, res, next) => {
     // Set up database (create tables and seed data)
     if (process.env.DATABASE_URL) {
       log('Setting up database...');
-      await setupDatabase();
+      // Recreate database with user roles
+      await recreateDatabase();
       log('Database setup completed');
     } else {
       log('No DATABASE_URL found, skipping database setup');

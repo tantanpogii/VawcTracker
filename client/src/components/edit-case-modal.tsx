@@ -98,15 +98,6 @@ export default function EditCaseModal({ isOpen, onClose, caseData }: EditCaseMod
   // Update form when caseData changes
   useEffect(() => {
     if (caseData) {
-      // Update services state based on case data
-      if (caseData.services) {
-        const updatedServices = servicesState.map(service => ({
-          ...service,
-          selected: caseData.services?.some(s => s.type === service.type && s.selected) || false
-        }));
-        setServicesState(updatedServices);
-      }
-
       form.reset({
         victimName: caseData.victimName,
         victimAge: caseData.victimAge,
@@ -120,9 +111,9 @@ export default function EditCaseModal({ isOpen, onClose, caseData }: EditCaseMod
         status: caseData.status,
         priority: caseData.priority,
         encoderName: caseData.encoderName,
-        services: caseData.services || servicesState,
-        otherServices: caseData.otherServices || "",
-        caseNotes: caseData.caseNotes || "",
+        services: servicesState,
+        otherServices: "",
+        caseNotes: "",
       });
     }
   }, [caseData, form]);
@@ -347,13 +338,13 @@ export default function EditCaseModal({ isOpen, onClose, caseData }: EditCaseMod
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="Physical abuse">Physical abuse</SelectItem>
-                          <SelectItem value="Verbal abuse">Verbal abuse</SelectItem>
-                          <SelectItem value="Economic abuse">Economic abuse</SelectItem>
-                          <SelectItem value="Sexual assault">Sexual assault</SelectItem>
-                          <SelectItem value="Workplace harassment">Workplace harassment</SelectItem>
-                          <SelectItem value="Child abuse">Child abuse</SelectItem>
-                          <SelectItem value="Other">Other</SelectItem>
+                          <SelectItem value="Physical Violence">Physical Violence</SelectItem>
+                          <SelectItem value="Sexual Violence">Sexual Violence</SelectItem>
+                          <SelectItem value="Psychological Violence">Psychological Violence</SelectItem>
+                          <SelectItem value="Economic abuse">Economic Abuse</SelectItem>
+                          <SelectItem value="Trafficking">Trafficking</SelectItem>
+                          <SelectItem value="Neglect">Neglect</SelectItem>
+                          <SelectItem value="Child Abuse">Child Abuse</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

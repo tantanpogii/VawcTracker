@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, ReactElement } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,16 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { ShieldAlert, Menu, Home, Folder, FileText, User, Settings, LogOut } from "lucide-react";
+import { ShieldAlert, Menu, Home, Folder, FileText, User, Settings, LogOut, Users } from "lucide-react";
+import RoleRestricted from "./role-restricted";
+
+// Define interface for navigation link items
+interface NavLink {
+  path: string;
+  label: string;
+  icon: ReactElement;
+  roles?: string[]; // Optional array of roles that can access this link
+}
 
 export default function Navbar() {
   const [location] = useLocation();
@@ -29,10 +38,23 @@ export default function Navbar() {
     await logout();
   };
 
-  const navLinks = [
+  // Regular navigation links available to all authenticated users
+  const commonNavLinks: NavLink[] = [
     { path: "/", label: "Dashboard", icon: <Home className="mr-2 h-4 w-4" /> },
     { path: "/cases", label: "Cases", icon: <Folder className="mr-2 h-4 w-4" /> },
-    { path: "/reports", label: "Reports", icon: <FileText className="mr-2 h-4 w-4" /> },
+  ];
+  
+  // Admin-only navigation links
+  const adminNavLinks: NavLink[] = [
+    { path: "/reports", label: "Reports", icon: <FileText className="mr-2 h-4 w-4" />, roles: ["administrator"] },
+    // For future admin pages
+    // { path: "/users", label: "Users", icon: <Users className="mr-2 h-4 w-4" />, roles: ["administrator"] },
+  ];
+  
+  // Combine common links with role-specific links
+  const navLinks: NavLink[] = [
+    ...commonNavLinks,
+    ...adminNavLinks
   ];
 
   return (
@@ -52,20 +74,43 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex space-x-1">
-            {navLinks.map((link) => (
-              <Link key={link.path} href={link.path}>
-                <Button 
-                  variant={isActive(link.path) ? "secondary" : "ghost"}
-                  className={isActive(link.path) 
-                    ? "bg-blue-200 text-black hover:bg-blue-300 hover:text-black" 
-                    : "text-primary-foreground hover:text-primary-foreground"
-                  }
-                >
-                  {link.icon}
-                  {link.label}
-                </Button>
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              // If link has roles, wrap in RoleRestricted
+              if (link.roles) {
+                return (
+                  <RoleRestricted key={link.path} allowedRoles={link.roles}>
+                    <Link href={link.path}>
+                      <Button 
+                        variant={isActive(link.path) ? "secondary" : "ghost"}
+                        className={isActive(link.path) 
+                          ? "bg-blue-200 text-black hover:bg-blue-300 hover:text-black" 
+                          : "text-primary-foreground hover:text-primary-foreground"
+                        }
+                      >
+                        {link.icon}
+                        {link.label}
+                      </Button>
+                    </Link>
+                  </RoleRestricted>
+                );
+              }
+              
+              // Otherwise, show to everyone
+              return (
+                <Link key={link.path} href={link.path}>
+                  <Button 
+                    variant={isActive(link.path) ? "secondary" : "ghost"}
+                    className={isActive(link.path) 
+                      ? "bg-blue-200 text-black hover:bg-blue-300 hover:text-black" 
+                      : "text-primary-foreground hover:text-primary-foreground"
+                    }
+                  >
+                    {link.icon}
+                    {link.label}
+                  </Button>
+                </Link>
+              );
+            })}
           </div>
 
           {/* User Menu */}
@@ -77,7 +122,10 @@ export default function Navbar() {
                   className="text-primary-foreground hover:text-primary-foreground gap-2 focus:ring-0"
                 >
                   <User className="h-5 w-5" />
-                  <span className="hidden sm:inline">{user?.fullName || 'User'}</span>
+                  <div className="hidden sm:flex flex-col items-start text-left">
+                    <span className="text-sm">{user?.fullName || 'User'}</span>
+                    <span className="text-xs opacity-80 capitalize">{user?.role || 'Guest'}</span>
+                  </div>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -115,21 +163,45 @@ export default function Navbar() {
                     <span className="font-bold text-lg">VAWC CMS</span>
                   </div>
                   
-                  {navLinks.map((link) => (
-                    <Link key={link.path} href={link.path}>
-                      <Button 
-                        variant={isActive(link.path) ? "secondary" : "ghost"}
-                        className={isActive(link.path) 
-                          ? "bg-blue-200 text-black hover:bg-blue-300 hover:text-black w-full justify-start" 
-                          : "w-full justify-start"
-                        }
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        {link.icon}
-                        {link.label}
-                      </Button>
-                    </Link>
-                  ))}
+                  {navLinks.map((link) => {
+                    // If link has roles restriction, wrap in RoleRestricted
+                    if (link.roles) {
+                      return (
+                        <RoleRestricted key={link.path} allowedRoles={link.roles}>
+                          <Link href={link.path}>
+                            <Button 
+                              variant={isActive(link.path) ? "secondary" : "ghost"}
+                              className={isActive(link.path) 
+                                ? "bg-blue-200 text-black hover:bg-blue-300 hover:text-black w-full justify-start" 
+                                : "w-full justify-start"
+                              }
+                              onClick={() => setIsMenuOpen(false)}
+                            >
+                              {link.icon}
+                              {link.label}
+                            </Button>
+                          </Link>
+                        </RoleRestricted>
+                      );
+                    }
+                    
+                    // Otherwise show to everyone
+                    return (
+                      <Link key={link.path} href={link.path}>
+                        <Button 
+                          variant={isActive(link.path) ? "secondary" : "ghost"}
+                          className={isActive(link.path) 
+                            ? "bg-blue-200 text-black hover:bg-blue-300 hover:text-black w-full justify-start" 
+                            : "w-full justify-start"
+                          }
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          {link.icon}
+                          {link.label}
+                        </Button>
+                      </Link>
+                    );
+                  })}
                   
                   <div className="border-t pt-4 mt-4">
                     <Button 
