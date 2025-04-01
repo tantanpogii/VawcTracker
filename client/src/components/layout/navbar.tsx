@@ -56,7 +56,10 @@ export default function Navbar() {
               <Link key={link.path} href={link.path}>
                 <Button 
                   variant={isActive(link.path) ? "secondary" : "ghost"}
-                  className="text-primary-foreground hover:text-primary-foreground"
+                  className={isActive(link.path) 
+                    ? "bg-blue-200 text-black hover:bg-blue-300 hover:text-black" 
+                    : "text-primary-foreground hover:text-primary-foreground"
+                  }
                 >
                   {link.icon}
                   {link.label}
@@ -116,7 +119,10 @@ export default function Navbar() {
                     <Link key={link.path} href={link.path}>
                       <Button 
                         variant={isActive(link.path) ? "secondary" : "ghost"}
-                        className="w-full justify-start"
+                        className={isActive(link.path) 
+                          ? "bg-blue-200 text-black hover:bg-blue-300 hover:text-black w-full justify-start" 
+                          : "w-full justify-start"
+                        }
                         onClick={() => setIsMenuOpen(false)}
                       >
                         {link.icon}
