@@ -1,11 +1,15 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { DBStorage } from "./db-storage";
 import jwt from "jsonwebtoken";
 import { loginSchema, insertCaseSchema } from "@shared/schema";
 import session from "express-session";
 import MemoryStore from "memorystore";
 import bcrypt from "bcrypt";
+
+// Use database storage for production or if DATABASE_URL is provided
+const dbStorage = process.env.DATABASE_URL ? new DBStorage() : storage;
 
 // JWT secret key
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
@@ -60,7 +64,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { username, password } = validationResult.data;
       
       // Validate user
-      const user = await storage.validateUser(username, password);
+      const user = await dbStorage.validateUser(username, password);
       
       if (!user) {
         return res.status(401).json({ message: "Invalid username or password" });
@@ -118,7 +122,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/auth/me", authenticateToken, async (req: Request, res: Response) => {
     try {
       const userId = req.user.id;
-      const user = await storage.getUser(userId);
+      const user = await dbStorage.getUser(userId);
       
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -141,7 +145,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Dashboard stats
   app.get("/api/dashboard", authenticateToken, async (req: Request, res: Response) => {
     try {
-      const stats = await storage.getDashboardStats();
+      const stats = await dbStorage.getDashboardStats();
       
       // Add change percentages (mocked for in-memory storage)
       const statsWithChanges = {
@@ -180,7 +184,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Case routes
   app.get("/api/cases", authenticateToken, async (req: Request, res: Response) => {
     try {
-      const cases = await storage.getCases();
+      const cases = await dbStorage.getCases();
       return res.json(cases);
     } catch (error) {
       console.error("Get cases error:", error);
@@ -196,7 +200,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid case ID" });
       }
       
-      const caseWithDetails = await storage.getCaseWithDetails(caseId);
+      const caseWithDetails = await dbStorage.getCaseWithDetails(caseId);
       
       if (!caseWithDetails) {
         return res.status(404).json({ message: "Case not found" });
@@ -223,7 +227,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Create the case
-      const newCase = await storage.createCase(validationResult.data);
+      const newCase = await dbStorage.createCase(validationResult.data);
       
       // Add services if provided
       if (req.body.services) {
@@ -232,7 +236,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .map((s: { type: string }) => s.type);
           
         for (const type of serviceTypes) {
-          await storage.addService({
+          await dbStorage.addService({
             type,
             dateProvided: new Date(),
             provider: req.body.encoderName,
@@ -243,7 +247,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Add initial note if provided
       if (req.body.caseNotes) {
-        await storage.addNote({
+        await dbStorage.addNote({
           content: req.body.caseNotes,
           authorId: req.user.id,
           caseId: newCase.id
@@ -277,7 +281,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Update the case
-      const updatedCase = await storage.updateCase(caseId, validationResult.data);
+      const updatedCase = await dbStorage.updateCase(caseId, validationResult.data);
       
       if (!updatedCase) {
         return res.status(404).json({ message: "Case not found" });
@@ -299,7 +303,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid case ID" });
       }
       
-      const deleted = await storage.deleteCase(caseId);
+      const deleted = await dbStorage.deleteCase(caseId);
       
       if (!deleted) {
         return res.status(404).json({ message: "Case not found" });
@@ -328,14 +332,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Add the note
-      const note = await storage.addNote({
+      const note = await dbStorage.addNote({
         content: req.body.content,
         authorId: req.user.id,
         caseId
       });
       
       // Get author info
-      const author = await storage.getUser(req.user.id);
+      const author = await dbStorage.getUser(req.user.id);
       
       return res.status(201).json({
         ...note,
@@ -366,7 +370,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Add the service
-      const service = await storage.addService({
+      const service = await dbStorage.addService({
         type: req.body.type,
         provider: req.body.provider,
         dateProvided: new Date(req.body.dateProvided),
