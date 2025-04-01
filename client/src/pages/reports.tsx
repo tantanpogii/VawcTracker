@@ -367,14 +367,14 @@ export default function Reports() {
         <TabsList className="mb-4 bg-slate-200">
           <TabsTrigger 
             value="charts" 
-            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+            className="data-[state=active]:bg-blue-200 data-[state=active]:text-black font-medium"
           >
             <PieChartIcon className="h-4 w-4 mr-2" />
             Charts
           </TabsTrigger>
           <TabsTrigger 
             value="table"
-            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+            className="data-[state=active]:bg-blue-200 data-[state=active]:text-black font-medium"
           >
             <FileText className="h-4 w-4 mr-2" />
             Data Table
