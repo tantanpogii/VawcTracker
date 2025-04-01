@@ -46,17 +46,18 @@ export async function setupDatabase() {
       CREATE TABLE IF NOT EXISTS cases (
         id SERIAL PRIMARY KEY,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-        date_reported TIMESTAMP WITH TIME ZONE NOT NULL,
-        entry_date TIMESTAMP WITH TIME ZONE NOT NULL,
         victim_name TEXT NOT NULL,
+        victim_age INTEGER,
+        victim_gender TEXT,
+        incident_date TIMESTAMP WITH TIME ZONE NOT NULL,
+        incident_type TEXT NOT NULL,
+        incident_location TEXT,
         perpetrator_name TEXT NOT NULL,
-        barangay TEXT NOT NULL,
-        status TEXT NOT NULL,
-        encoder_id INTEGER NOT NULL,
+        perpetrator_relationship TEXT,
         encoder_name TEXT NOT NULL,
-        encoder_position TEXT NOT NULL,
-        encoder_office TEXT NOT NULL
+        status TEXT NOT NULL,
+        priority TEXT,
+        case_notes TEXT
       );
 
       CREATE TABLE IF NOT EXISTS services (

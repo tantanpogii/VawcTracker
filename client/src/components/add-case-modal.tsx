@@ -367,6 +367,7 @@ export default function AddCaseModal({ isOpen, onClose }: AddCaseModalProps) {
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value || "Medium"}
+                        value={field.value || "Medium"}
                       >
                         <FormControl>
                           <SelectTrigger>
