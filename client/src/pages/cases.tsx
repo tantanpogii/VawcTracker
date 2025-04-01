@@ -256,7 +256,7 @@ export default function Cases() {
                   <TableHead>
                     <Button
                       variant="ghost"
-                      onClick={() => handleSort('dateReported')}
+                      onClick={() => handleSort('createdAt')}
                       className="flex items-center"
                     >
                       Date
@@ -300,7 +300,7 @@ export default function Cases() {
                 ) : paginatedCases.length > 0 ? (
                   paginatedCases.map((caseItem) => (
                     <TableRow key={caseItem.id}>
-                      <TableCell>{formatDate(new Date(caseItem.dateReported))}</TableCell>
+                      <TableCell>{formatDate(new Date(caseItem.createdAt))}</TableCell>
                       <TableCell className="font-medium">{caseItem.victimName}</TableCell>
                       <TableCell>{caseItem.encoderName}</TableCell>
                       <TableCell>{caseItem.barangay}</TableCell>

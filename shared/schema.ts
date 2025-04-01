@@ -63,6 +63,7 @@ export const cases = pgTable("cases", {
   victimName: text("victim_name").notNull(),
   victimAge: integer("victim_age"),
   victimGender: text("victim_gender"),
+  barangay: text("barangay"), // Added barangay field
   incidentDate: timestamp("incident_date").notNull(),
   incidentType: text("incident_type").notNull(),
   incidentLocation: text("incident_location"),

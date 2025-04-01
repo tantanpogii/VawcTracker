@@ -237,7 +237,7 @@ export default function CaseDetail({ id }: CaseDetailProps) {
                     <Skeleton className="h-6 w-32" />
                   ) : (
                     <p className="font-medium">
-                      {formatDate(new Date(caseData?.dateReported!))}
+                      {formatDate(new Date(caseData?.createdAt!))}
                     </p>
                   )}
                 </div>

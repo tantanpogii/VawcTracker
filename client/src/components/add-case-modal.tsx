@@ -222,6 +222,41 @@ export default function AddCaseModal({ isOpen, onClose }: AddCaseModalProps) {
                     </FormItem>
                   )}
                 />
+                
+                <FormField
+                  control={form.control}
+                  name="barangay"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Barangay
+                      </FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value || ""}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Barangay" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Barangay 1">Barangay 1</SelectItem>
+                          <SelectItem value="Barangay 2">Barangay 2</SelectItem>
+                          <SelectItem value="Barangay 3">Barangay 3</SelectItem>
+                          <SelectItem value="Barangay 4">Barangay 4</SelectItem>
+                          <SelectItem value="Barangay 5">Barangay 5</SelectItem>
+                          <SelectItem value="Barangay 6">Barangay 6</SelectItem>
+                          <SelectItem value="Barangay 7">Barangay 7</SelectItem>
+                          <SelectItem value="Barangay 8">Barangay 8</SelectItem>
+                          <SelectItem value="Barangay 9">Barangay 9</SelectItem>
+                          <SelectItem value="Barangay 10">Barangay 10</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={form.control}
