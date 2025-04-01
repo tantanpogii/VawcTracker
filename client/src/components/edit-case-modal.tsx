@@ -39,7 +39,25 @@ import { Save } from "lucide-react";
 interface EditCaseModalProps {
   isOpen: boolean;
   onClose: () => void;
-  caseData: Case | null;
+  caseData: {
+    id: number;
+    victimName: string;
+    victimAge: number | null;
+    victimGender: string | null;
+    barangay: string | null;
+    incidentDate: Date;
+    incidentType: string;
+    incidentLocation: string | null;
+    perpetratorName: string;
+    perpetratorRelationship: string | null;
+    status: string;
+    priority: string;
+    encoderName: string;
+    createdAt: Date;
+    caseNotes?: string;
+    services?: { type: string; selected: boolean }[];
+    otherServices?: string;
+  } | null;
 }
 
 export default function EditCaseModal({ isOpen, onClose, caseData }: EditCaseModalProps) {

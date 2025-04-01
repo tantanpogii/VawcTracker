@@ -8,6 +8,7 @@ import Login from "@/pages/login";
 import Dashboard from "@/pages/dashboard";
 import Cases from "@/pages/cases";
 import CaseDetail from "@/pages/case-detail";
+import Reports from "@/pages/reports";
 import PrivateRoute from "@/components/layout/private-route";
 import Navbar from "@/components/layout/navbar";
 
@@ -34,6 +35,12 @@ function Router() {
             <CaseDetail id={parseInt(params.id)} />
           </PrivateRoute>
         )}
+      </Route>
+      <Route path="/reports">
+        <PrivateRoute>
+          <Navbar />
+          <Reports />
+        </PrivateRoute>
       </Route>
       <Route component={NotFound} />
     </Switch>

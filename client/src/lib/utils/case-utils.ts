@@ -1,88 +1,45 @@
+import { format } from "date-fns";
+
 /**
- * Format a date object into a readable string
+ * Formats a date in a readable format (e.g., "January 1, 2023")
  */
 export function formatDate(date: Date): string {
-  if (!date || isNaN(date.getTime())) {
-    return 'Invalid date';
-  }
-  
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  }).format(date);
+  return format(date, "MMMM d, yyyy");
 }
 
 /**
- * Format a date with time
+ * Formats a date with time in a readable format (e.g., "January 1, 2023 at 12:00 PM")
  */
 export function formatDateTime(date: Date): string {
-  if (!date || isNaN(date.getTime())) {
-    return 'Invalid date';
-  }
-  
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-  }).format(date);
+  return format(date, "MMMM d, yyyy 'at' h:mm a");
 }
 
 /**
- * Get a relative time string (e.g. "2 hours ago", "yesterday", etc.)
- */
-export function getRelativeTimeString(date: Date): string {
-  const now = new Date();
-  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-  
-  if (diffInSeconds < 60) {
-    return 'just now';
-  }
-  
-  const diffInMinutes = Math.floor(diffInSeconds / 60);
-  if (diffInMinutes < 60) {
-    return `${diffInMinutes} ${diffInMinutes === 1 ? 'minute' : 'minutes'} ago`;
-  }
-  
-  const diffInHours = Math.floor(diffInMinutes / 60);
-  if (diffInHours < 24) {
-    return `${diffInHours} ${diffInHours === 1 ? 'hour' : 'hours'} ago`;
-  }
-  
-  const diffInDays = Math.floor(diffInHours / 24);
-  if (diffInDays === 1) {
-    return 'yesterday';
-  }
-  if (diffInDays < 7) {
-    return `${diffInDays} days ago`;
-  }
-  
-  // For older dates, return the formatted date
-  return formatDate(date);
-}
-
-/**
- * Format case status for display
+ * Converts a status string to a proper case display string
  */
 export function formatStatus(status: string): string {
   return status.charAt(0).toUpperCase() + status.slice(1);
 }
 
 /**
- * Get a color class based on status
+ * Generates priority color classes based on priority level
  */
-export function getStatusColor(status: string): string {
-  switch (status.toLowerCase()) {
-    case 'active':
-      return 'text-green-600';
-    case 'pending':
-      return 'text-amber-500';
-    case 'closed':
-      return 'text-gray-500';
+export function getPriorityColorClass(priority: string): string {
+  switch (priority.toLowerCase()) {
+    case "high":
+      return "text-red-600";
+    case "medium":
+      return "text-amber-600";
+    case "low":
+      return "text-blue-600";
     default:
-      return 'text-gray-500';
+      return "text-gray-600";
   }
+}
+
+/**
+ * Formats a case ID for display (e.g., "#001" for case with ID 1)
+ */
+export function formatCaseId(id: number): string {
+  return `#${id.toString().padStart(3, "0")}`;
 }
