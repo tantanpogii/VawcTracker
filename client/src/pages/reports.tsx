@@ -364,12 +364,18 @@ export default function Reports() {
 
       {/* Main Report Content */}
       <Tabs defaultValue="charts" className="w-full">
-        <TabsList className="mb-4">
-          <TabsTrigger value="charts">
+        <TabsList className="mb-4 bg-slate-200">
+          <TabsTrigger 
+            value="charts" 
+            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+          >
             <PieChartIcon className="h-4 w-4 mr-2" />
             Charts
           </TabsTrigger>
-          <TabsTrigger value="table">
+          <TabsTrigger 
+            value="table"
+            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+          >
             <FileText className="h-4 w-4 mr-2" />
             Data Table
           </TabsTrigger>
