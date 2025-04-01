@@ -10,7 +10,6 @@ export const users = pgTable("users", {
   fullName: text("full_name").notNull(),
   position: text("position"),
   office: text("office"),
-  role: text("role").default("editor").notNull(), // administrator or editor
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

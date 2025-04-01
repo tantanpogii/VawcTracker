@@ -9,7 +9,6 @@ interface User {
   fullName: string;
   position: string;
   office: string;
-  role: string;
 }
 
 // Auth context interface
@@ -90,20 +89,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       
       // Set user data
       setUser(data.user);
-      
-      // Set the auth header for all future requests
-      const headers = new Headers();
-      headers.append("Authorization", `Bearer ${data.token}`);
-      
-      // Verify the token works by making a request to /api/auth/me
-      const verifyResponse = await fetch("/api/auth/me", {
-        headers,
-        credentials: "include",
-      });
-      
-      if (!verifyResponse.ok) {
-        throw new Error("Authentication verification failed");
-      }
       
       return data;
     } catch (error) {

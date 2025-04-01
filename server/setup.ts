@@ -40,8 +40,7 @@ export async function setupDatabase() {
         password TEXT NOT NULL,
         full_name TEXT NOT NULL,
         position TEXT,
-        office TEXT,
-        role TEXT DEFAULT 'editor' NOT NULL
+        office TEXT
       );
 
       CREATE TABLE IF NOT EXISTS cases (

@@ -245,19 +245,7 @@ export class DBStorage implements IStorage {
         password: adminPassword,
         fullName: "Admin User",
         position: "System Administrator",
-        office: "VAWC Office",
-        role: "administrator"
-      });
-      
-      // Create editor user
-      const editorPassword = await bcrypt.hash("editor123", 10);
-      await this.createUser({
-        username: "editor",
-        password: editorPassword,
-        fullName: "Editor User",
-        position: "Case Encoder",
-        office: "VAWC Office",
-        role: "editor"
+        office: "VAWC Office"
       });
 
       // Create some sample staff users
@@ -267,8 +255,7 @@ export class DBStorage implements IStorage {
         password: staffPassword,
         fullName: "Juan Dela Cruz",
         position: "VAWC Coordinator",
-        office: "Municipal Social Welfare Department",
-        role: "editor"
+        office: "Municipal Social Welfare Department"
       });
       
       const roseUser = await this.createUser({
@@ -276,8 +263,7 @@ export class DBStorage implements IStorage {
         password: staffPassword,
         fullName: "Rose Manalo",
         position: "Social Worker",
-        office: "Municipal Social Welfare Department",
-        role: "editor"
+        office: "Municipal Social Welfare Department"
       });
 
       // Create 5 sample VAWC cases
