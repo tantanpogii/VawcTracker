@@ -238,7 +238,7 @@ export default function AddCaseModal({ isOpen, onClose }: AddCaseModalProps) {
                       </FormLabel>
                       <Select
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        defaultValue={field.value || "Poblacion"}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -284,7 +284,7 @@ export default function AddCaseModal({ isOpen, onClose }: AddCaseModalProps) {
                       </FormLabel>
                       <Select
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        defaultValue={field.value || "active"}
                       >
                         <FormControl>
                           <SelectTrigger>
