@@ -62,11 +62,11 @@ export default function Dashboard() {
           {isLoading ? (
             <Skeleton className="h-6 w-32 bg-white/20" />
           ) : (
-            <span className="badge bg-white text-xs px-2 py-1 rounded font-medium">
+            <span className="badge bg-white/90 text-xs px-2 py-1 rounded font-medium text-black">
               {change?.startsWith('-') ? (
-                <ArrowDown className="h-3 w-3 inline mr-1" />
+                <ArrowDown className="h-3 w-3 inline mr-1 text-red-600" />
               ) : (
-                <ArrowUp className="h-3 w-3 inline mr-1" />
+                <ArrowUp className="h-3 w-3 inline mr-1 text-green-600" />
               )}
               {change} from last month
             </span>
