@@ -68,7 +68,7 @@ export class MemStorage implements IStorage {
   private async createInitialData() {
     // Create admin user
     const adminPassword = await bcrypt.hash("admin123", 10);
-    this.createUser({
+    const adminUser = await this.createUser({
       username: "admin",
       password: adminPassword,
       fullName: "Admin User",
@@ -78,7 +78,7 @@ export class MemStorage implements IStorage {
 
     // Create some sample staff users
     const staffPassword = await bcrypt.hash("password", 10);
-    this.createUser({
+    const juanUser = await this.createUser({
       username: "jdelacruz",
       password: staffPassword,
       fullName: "Juan Dela Cruz",
@@ -86,12 +86,189 @@ export class MemStorage implements IStorage {
       office: "Municipal Social Welfare Department"
     });
     
-    this.createUser({
+    const roseUser = await this.createUser({
       username: "rmanalo",
       password: staffPassword,
       fullName: "Rose Manalo",
       position: "Social Worker",
       office: "Municipal Social Welfare Department"
+    });
+
+    // Create 5 sample VAWC cases
+    
+    // Case 1
+    const case1 = await this.createCase({
+      dateReported: new Date(2023, 11, 15),
+      entryDate: new Date(2023, 11, 16),
+      victimName: "Maria Santos",
+      perpetratorName: "Pedro Santos",
+      barangay: "Barangay Poblacion",
+      status: "active",
+      encoderId: adminUser.id,
+      encoderName: adminUser.fullName,
+      encoderPosition: adminUser.position,
+      encoderOffice: adminUser.office
+    });
+    
+    // Add service for case 1
+    await this.addService({
+      type: "Medical assistance",
+      dateProvided: new Date(2023, 11, 17),
+      provider: "Municipal Health Office",
+      notes: "Initial medical examination conducted",
+      caseId: case1.id
+    });
+    
+    // Add notes for case 1
+    await this.addNote({
+      content: "Victim reported multiple physical abuse incidents in the past 3 months",
+      authorId: adminUser.id,
+      caseId: case1.id
+    });
+    
+    // Case 2
+    const case2 = await this.createCase({
+      dateReported: new Date(2023, 11, 10),
+      entryDate: new Date(2023, 11, 10),
+      victimName: "Ana Reyes",
+      perpetratorName: "Roberto Garcia",
+      barangay: "Barangay San Jose",
+      status: "pending",
+      encoderId: juanUser.id,
+      encoderName: juanUser.fullName,
+      encoderPosition: juanUser.position,
+      encoderOffice: juanUser.office
+    });
+    
+    // Add service for case 2
+    await this.addService({
+      type: "Legal assistance",
+      dateProvided: new Date(2023, 11, 12),
+      provider: "Municipal Legal Office",
+      notes: "Provided legal advice and assisted in filing protection order",
+      caseId: case2.id
+    });
+    
+    // Add service for case 2
+    await this.addService({
+      type: "Counseling",
+      dateProvided: new Date(2023, 11, 13),
+      provider: "DSWD Counselor",
+      notes: "Initial psychological assessment conducted",
+      caseId: case2.id
+    });
+    
+    // Add notes for case 2
+    await this.addNote({
+      content: "Victim seeking protection order against ex-partner",
+      authorId: juanUser.id,
+      caseId: case2.id
+    });
+    
+    // Case 3
+    const case3 = await this.createCase({
+      dateReported: new Date(2023, 10, 5),
+      entryDate: new Date(2023, 10, 5),
+      victimName: "Sophia Cruz",
+      perpetratorName: "Miguel Cruz",
+      barangay: "Barangay Santa Clara",
+      status: "closed",
+      encoderId: roseUser.id,
+      encoderName: roseUser.fullName,
+      encoderPosition: roseUser.position,
+      encoderOffice: roseUser.office
+    });
+    
+    // Add service for case 3
+    await this.addService({
+      type: "Temporary shelter",
+      dateProvided: new Date(2023, 10, 5),
+      provider: "Municipal VAWC Shelter",
+      notes: "Provided temporary housing for 7 days",
+      caseId: case3.id
+    });
+    
+    // Add notes for case 3
+    await this.addNote({
+      content: "Case resolved through family mediation. Victim reconciled with partner after counseling.",
+      authorId: roseUser.id,
+      caseId: case3.id
+    });
+    
+    // Add follow-up note
+    await this.addNote({
+      content: "Follow-up visit conducted. Situation remains stable.",
+      authorId: adminUser.id,
+      caseId: case3.id
+    });
+
+    // Case 4
+    const case4 = await this.createCase({
+      dateReported: new Date(2023, 11, 28),
+      entryDate: new Date(2023, 11, 28),
+      victimName: "Jasmine Martinez",
+      perpetratorName: "Antonio Reyes",
+      barangay: "Barangay Mabuhay",
+      status: "active",
+      encoderId: juanUser.id,
+      encoderName: juanUser.fullName,
+      encoderPosition: juanUser.position,
+      encoderOffice: juanUser.office
+    });
+    
+    // Add service for case 4
+    await this.addService({
+      type: "Medical assistance",
+      dateProvided: new Date(2023, 11, 28),
+      provider: "Provincial Hospital",
+      notes: "Treated for injuries and provided medical certificate",
+      caseId: case4.id
+    });
+    
+    // Add notes for case 4
+    await this.addNote({
+      content: "Victim reported physical and verbal abuse by employer. Filed police report.",
+      authorId: juanUser.id,
+      caseId: case4.id
+    });
+
+    // Case 5
+    const case5 = await this.createCase({
+      dateReported: new Date(2023, 11, 20),
+      entryDate: new Date(2023, 11, 21),
+      victimName: "Lilia Mendoza",
+      perpetratorName: "Eduardo Mendoza",
+      barangay: "Barangay Bagong Silang",
+      status: "pending",
+      encoderId: roseUser.id,
+      encoderName: roseUser.fullName,
+      encoderPosition: roseUser.position,
+      encoderOffice: roseUser.office
+    });
+    
+    // Add service for case 5
+    await this.addService({
+      type: "Counseling",
+      dateProvided: new Date(2023, 11, 22),
+      provider: "Municipal Psychologist",
+      notes: "Initial counseling session provided",
+      caseId: case5.id
+    });
+    
+    // Add service for case 5
+    await this.addService({
+      type: "Financial assistance",
+      dateProvided: new Date(2023, 11, 23),
+      provider: "DSWD",
+      notes: "Emergency financial assistance provided for basic needs",
+      caseId: case5.id
+    });
+    
+    // Add notes for case 5
+    await this.addNote({
+      content: "Victim seeking separation from spouse due to recurring domestic violence",
+      authorId: roseUser.id,
+      caseId: case5.id
     });
   }
 
@@ -266,12 +443,81 @@ export class MemStorage implements IStorage {
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
       .slice(0, 5);
     
+    // Create detailed cases with services and notes
+    const detailedCases = await Promise.all(
+      recentCases.map(async (caseItem) => {
+        return this.getCaseWithDetails(caseItem.id);
+      })
+    );
+    
+    // Filter out any undefined results
+    const validDetailedCases = detailedCases.filter(
+      (caseItem): caseItem is CaseWithDetails => caseItem !== undefined
+    );
+    
+    // Create sample staff activities
+    const staffActivities = [
+      {
+        authorId: 1,
+        authorName: "Admin User",
+        action: "Created new case",
+        timestamp: new Date(2023, 11, 16),
+        caseId: 1,
+        victimName: "Maria Santos"
+      },
+      {
+        authorId: 2,
+        authorName: "Juan Dela Cruz",
+        action: "Added legal assistance service",
+        timestamp: new Date(2023, 11, 12),
+        caseId: 2,
+        victimName: "Ana Reyes"
+      },
+      {
+        authorId: 3,
+        authorName: "Rose Manalo",
+        action: "Closed case",
+        timestamp: new Date(2023, 10, 15),
+        caseId: 3,
+        victimName: "Sophia Cruz"
+      },
+      {
+        authorId: 2,
+        authorName: "Juan Dela Cruz",
+        action: "Filed police report",
+        timestamp: new Date(2023, 11, 28),
+        caseId: 4,
+        victimName: "Jasmine Martinez"
+      },
+      {
+        authorId: 3,
+        authorName: "Rose Manalo",
+        action: "Added counseling service",
+        timestamp: new Date(2023, 11, 22),
+        caseId: 5,
+        victimName: "Lilia Mendoza"
+      },
+      {
+        authorId: 1,
+        authorName: "Admin User",
+        action: "Updated case information",
+        timestamp: new Date(2023, 11, 30),
+        caseId: 1,
+        victimName: "Maria Santos"
+      },
+    ];
+    
     return {
       totalCases: allCases.length,
       activeCases: activeCases.length,
       pendingCases: pendingCases.length,
       closedCases: closedCases.length,
-      recentCases
+      totalCasesChange: "+20%",
+      activeCasesChange: "+10%",
+      pendingCasesChange: "+5%",
+      closedCasesChange: "-2%",
+      recentCases: validDetailedCases,
+      staffActivities
     };
   }
 }
