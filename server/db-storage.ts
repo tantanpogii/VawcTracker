@@ -42,8 +42,24 @@ export class DBStorage implements IStorage {
   }
 
   // Case methods
-  async createCase(caseData: InsertCase): Promise<Case> {
-    const result = await db.insert(cases).values(caseData).returning();
+  async createCase(caseData: any): Promise<Case> {
+    // Convert the incoming data to match the new schema if needed
+    const newCaseData = {
+      victimName: caseData.victimName,
+      incidentDate: caseData.incidentDate || new Date(),
+      incidentType: caseData.incidentType || "Not specified",
+      perpetratorName: caseData.perpetratorName,
+      encoderName: caseData.encoderName,
+      status: caseData.status,
+      priority: caseData.priority || "Medium",
+      victimAge: caseData.victimAge || null,
+      victimGender: caseData.victimGender || null,
+      incidentLocation: caseData.incidentLocation || null,
+      perpetratorRelationship: caseData.perpetratorRelationship || null,
+      caseNotes: caseData.caseNotes || null
+    };
+    
+    const result = await db.insert(cases).values(newCaseData).returning();
     return result[0];
   }
 
@@ -88,12 +104,9 @@ export class DBStorage implements IStorage {
     const existingCase = await this.getCase(id);
     if (!existingCase) return undefined;
     
-    const now = new Date();
-    const updatedData = { ...caseData, updatedAt: now };
-    
     const result = await db
       .update(cases)
-      .set(updatedData)
+      .set(caseData)
       .where(eq(cases.id, id))
       .returning();
     
@@ -257,16 +270,17 @@ export class DBStorage implements IStorage {
       
       // Case 1
       const case1 = await this.createCase({
-        dateReported: new Date(2023, 11, 15),
-        entryDate: new Date(2023, 11, 16),
+        incidentDate: new Date(2023, 11, 15),
         victimName: "Maria Santos",
+        victimAge: 32,
+        victimGender: "Female",
+        incidentType: "Physical abuse",
+        incidentLocation: "Residence",
         perpetratorName: "Pedro Santos",
-        barangay: "Barangay Poblacion",
+        perpetratorRelationship: "Husband",
         status: "active",
-        encoderId: adminUser.id,
-        encoderName: adminUser.fullName,
-        encoderPosition: adminUser.position || "",
-        encoderOffice: adminUser.office || ""
+        priority: "High",
+        encoderName: adminUser.fullName
       });
       
       // Add service for case 1
@@ -287,16 +301,17 @@ export class DBStorage implements IStorage {
       
       // Case 2
       const case2 = await this.createCase({
-        dateReported: new Date(2023, 11, 10),
-        entryDate: new Date(2023, 11, 10),
+        incidentDate: new Date(2023, 11, 10),
         victimName: "Ana Reyes",
+        victimAge: 28,
+        victimGender: "Female",
+        incidentType: "Verbal abuse",
+        incidentLocation: "Workplace",
         perpetratorName: "Roberto Garcia",
-        barangay: "Barangay San Jose",
+        perpetratorRelationship: "Ex-boyfriend",
         status: "pending",
-        encoderId: juanUser.id,
-        encoderName: juanUser.fullName,
-        encoderPosition: juanUser.position || "",
-        encoderOffice: juanUser.office || ""
+        priority: "Medium",
+        encoderName: juanUser.fullName
       });
       
       // Add service for case 2
@@ -326,16 +341,17 @@ export class DBStorage implements IStorage {
       
       // Case 3
       const case3 = await this.createCase({
-        dateReported: new Date(2023, 10, 5),
-        entryDate: new Date(2023, 10, 5),
+        incidentDate: new Date(2023, 10, 5),
         victimName: "Sophia Cruz",
+        victimAge: 35,
+        victimGender: "Female",
+        incidentType: "Economic abuse",
+        incidentLocation: "Residence",
         perpetratorName: "Miguel Cruz",
-        barangay: "Barangay Santa Clara",
+        perpetratorRelationship: "Husband",
         status: "closed",
-        encoderId: roseUser.id,
-        encoderName: roseUser.fullName,
-        encoderPosition: roseUser.position || "",
-        encoderOffice: roseUser.office || ""
+        priority: "Low",
+        encoderName: roseUser.fullName
       });
       
       // Add service for case 3
@@ -363,16 +379,17 @@ export class DBStorage implements IStorage {
 
       // Case 4
       const case4 = await this.createCase({
-        dateReported: new Date(2023, 11, 28),
-        entryDate: new Date(2023, 11, 28),
+        incidentDate: new Date(2023, 11, 28),
         victimName: "Jasmine Martinez",
+        victimAge: 22,
+        victimGender: "Female",
+        incidentType: "Workplace harassment",
+        incidentLocation: "Office building",
         perpetratorName: "Antonio Reyes",
-        barangay: "Barangay Mabuhay",
+        perpetratorRelationship: "Employer",
         status: "active",
-        encoderId: juanUser.id,
-        encoderName: juanUser.fullName,
-        encoderPosition: juanUser.position || "",
-        encoderOffice: juanUser.office || ""
+        priority: "High",
+        encoderName: juanUser.fullName
       });
       
       // Add service for case 4
@@ -393,16 +410,17 @@ export class DBStorage implements IStorage {
 
       // Case 5
       const case5 = await this.createCase({
-        dateReported: new Date(2023, 11, 20),
-        entryDate: new Date(2023, 11, 21),
+        incidentDate: new Date(2023, 11, 20),
         victimName: "Lilia Mendoza",
+        victimAge: 29,
+        victimGender: "Female",
+        incidentType: "Physical and emotional abuse",
+        incidentLocation: "Residence",
         perpetratorName: "Eduardo Mendoza",
-        barangay: "Barangay Bagong Silang",
+        perpetratorRelationship: "Spouse",
         status: "pending",
-        encoderId: roseUser.id,
-        encoderName: roseUser.fullName,
-        encoderPosition: roseUser.position || "",
-        encoderOffice: roseUser.office || ""
+        priority: "Medium",
+        encoderName: roseUser.fullName
       });
       
       // Add service for case 5

@@ -60,24 +60,24 @@ export type Note = typeof notes.$inferSelect;
 // VAWC Cases
 export const cases = pgTable("cases", {
   id: serial("id").primaryKey(),
-  dateReported: timestamp("date_reported").notNull(),
-  entryDate: timestamp("entry_date").notNull(),
   victimName: text("victim_name").notNull(),
+  victimAge: integer("victim_age"),
+  victimGender: text("victim_gender"),
+  incidentDate: timestamp("incident_date").notNull(),
+  incidentType: text("incident_type").notNull(),
+  incidentLocation: text("incident_location"),
   perpetratorName: text("perpetrator_name").notNull(),
-  barangay: text("barangay").notNull(),
-  status: text("status").notNull(), // active, pending, closed
-  encoderId: integer("encoder_id").notNull(),
+  perpetratorRelationship: text("perpetrator_relationship"),
   encoderName: text("encoder_name").notNull(),
-  encoderPosition: text("encoder_position").notNull(),
-  encoderOffice: text("encoder_office").notNull(),
+  status: text("status").notNull(), // active, pending, closed
+  priority: text("priority"),
+  caseNotes: text("case_notes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const insertCaseSchema = createInsertSchema(cases).omit({
   id: true, 
   createdAt: true,
-  updatedAt: true,
 });
 
 export type InsertCase = z.infer<typeof insertCaseSchema>;

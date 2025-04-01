@@ -98,16 +98,17 @@ export class MemStorage implements IStorage {
     
     // Case 1
     const case1 = await this.createCase({
-      dateReported: new Date(2023, 11, 15),
-      entryDate: new Date(2023, 11, 16),
       victimName: "Maria Santos",
+      victimAge: 32,
+      victimGender: "Female",
+      incidentDate: new Date(2023, 11, 15),
+      incidentType: "Physical abuse",
+      incidentLocation: "Barangay Poblacion",
       perpetratorName: "Pedro Santos",
-      barangay: "Barangay Poblacion",
+      perpetratorRelationship: "Husband",
       status: "active",
-      encoderId: adminUser.id,
-      encoderName: adminUser.fullName,
-      encoderPosition: adminUser.position,
-      encoderOffice: adminUser.office
+      priority: "High",
+      encoderName: adminUser.fullName
     });
     
     // Add service for case 1
@@ -128,16 +129,17 @@ export class MemStorage implements IStorage {
     
     // Case 2
     const case2 = await this.createCase({
-      dateReported: new Date(2023, 11, 10),
-      entryDate: new Date(2023, 11, 10),
       victimName: "Ana Reyes",
+      victimAge: 28,
+      victimGender: "Female",
+      incidentDate: new Date(2023, 11, 10),
+      incidentType: "Verbal abuse",
+      incidentLocation: "Barangay San Jose",
       perpetratorName: "Roberto Garcia",
-      barangay: "Barangay San Jose",
+      perpetratorRelationship: "Ex-boyfriend",
       status: "pending",
-      encoderId: juanUser.id,
-      encoderName: juanUser.fullName,
-      encoderPosition: juanUser.position,
-      encoderOffice: juanUser.office
+      priority: "Medium",
+      encoderName: juanUser.fullName
     });
     
     // Add service for case 2
@@ -167,16 +169,17 @@ export class MemStorage implements IStorage {
     
     // Case 3
     const case3 = await this.createCase({
-      dateReported: new Date(2023, 10, 5),
-      entryDate: new Date(2023, 10, 5),
       victimName: "Sophia Cruz",
+      victimAge: 35,
+      victimGender: "Female",
+      incidentDate: new Date(2023, 10, 5),
+      incidentType: "Economic abuse",
+      incidentLocation: "Barangay Santa Clara",
       perpetratorName: "Miguel Cruz",
-      barangay: "Barangay Santa Clara",
+      perpetratorRelationship: "Husband",
       status: "closed",
-      encoderId: roseUser.id,
-      encoderName: roseUser.fullName,
-      encoderPosition: roseUser.position,
-      encoderOffice: roseUser.office
+      priority: "Low",
+      encoderName: roseUser.fullName
     });
     
     // Add service for case 3
@@ -204,16 +207,17 @@ export class MemStorage implements IStorage {
 
     // Case 4
     const case4 = await this.createCase({
-      dateReported: new Date(2023, 11, 28),
-      entryDate: new Date(2023, 11, 28),
       victimName: "Jasmine Martinez",
+      victimAge: 24,
+      victimGender: "Female",
+      incidentDate: new Date(2023, 11, 28),
+      incidentType: "Workplace harassment",
+      incidentLocation: "Barangay Mabuhay",
       perpetratorName: "Antonio Reyes",
-      barangay: "Barangay Mabuhay",
+      perpetratorRelationship: "Employer",
       status: "active",
-      encoderId: juanUser.id,
-      encoderName: juanUser.fullName,
-      encoderPosition: juanUser.position,
-      encoderOffice: juanUser.office
+      priority: "High",
+      encoderName: juanUser.fullName
     });
     
     // Add service for case 4
@@ -234,16 +238,17 @@ export class MemStorage implements IStorage {
 
     // Case 5
     const case5 = await this.createCase({
-      dateReported: new Date(2023, 11, 20),
-      entryDate: new Date(2023, 11, 21),
       victimName: "Lilia Mendoza",
+      victimAge: 41,
+      victimGender: "Female",
+      incidentDate: new Date(2023, 11, 20),
+      incidentType: "Physical abuse",
+      incidentLocation: "Barangay Bagong Silang",
       perpetratorName: "Eduardo Mendoza",
-      barangay: "Barangay Bagong Silang",
+      perpetratorRelationship: "Husband",
       status: "pending",
-      encoderId: roseUser.id,
-      encoderName: roseUser.fullName,
-      encoderPosition: roseUser.position,
-      encoderOffice: roseUser.office
+      priority: "Medium",
+      encoderName: roseUser.fullName
     });
     
     // Add service for case 5
@@ -289,7 +294,9 @@ export class MemStorage implements IStorage {
     const user: User = { 
       ...insertUser, 
       id,
-      createdAt: now
+      createdAt: now,
+      position: insertUser.position || null,
+      office: insertUser.office || null
     };
     this.users.set(id, user);
     return user;
@@ -311,7 +318,12 @@ export class MemStorage implements IStorage {
       ...caseData,
       id,
       createdAt: now,
-      updatedAt: now
+      victimAge: caseData.victimAge || null,
+      victimGender: caseData.victimGender || null,
+      incidentLocation: caseData.incidentLocation || null,
+      perpetratorRelationship: caseData.perpetratorRelationship || null,
+      priority: caseData.priority || null,
+      caseNotes: caseData.caseNotes || null
     };
     this.cases.set(id, newCase);
     return newCase;
@@ -361,8 +373,7 @@ export class MemStorage implements IStorage {
     
     const updatedCase: Case = {
       ...existingCase,
-      ...caseData,
-      updatedAt: new Date()
+      ...caseData
     };
     
     this.cases.set(id, updatedCase);
@@ -400,7 +411,8 @@ export class MemStorage implements IStorage {
     const service: Service = {
       ...serviceData,
       id,
-      createdAt: now
+      createdAt: now,
+      notes: serviceData.notes || null
     };
     this.services.set(id, service);
     return service;

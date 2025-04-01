@@ -58,16 +58,17 @@ export default function AddCaseModal({ isOpen, onClose }: AddCaseModalProps) {
   const form = useForm<CaseFormData>({
     resolver: zodResolver(caseFormSchema),
     defaultValues: {
-      dateReported: new Date().toISOString(),
-      entryDate: new Date().toISOString(),
       victimName: "",
+      victimAge: undefined,
+      victimGender: undefined,
+      incidentDate: new Date(),
+      incidentType: "",
+      incidentLocation: "",
       perpetratorName: "",
-      barangay: "",
+      perpetratorRelationship: "",
       status: "active",
-      encoderId: user?.id || 0,
+      priority: "Medium",
       encoderName: user?.fullName || "",
-      encoderPosition: user?.position || "",
-      encoderOffice: user?.office || "",
       services: servicesState,
       otherServices: "",
       caseNotes: "",
@@ -137,66 +138,11 @@ export default function AddCaseModal({ isOpen, onClose }: AddCaseModalProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name="entryDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="after:content-['*'] after:text-destructive after:ml-1">
-                        Date of Entry
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="date"
-                          value={field.value.split('T')[0]}
-                          onChange={(e) => {
-                            const date = new Date(e.target.value);
-                            field.onChange(date.toISOString());
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
                   name="encoderName"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="after:content-['*'] after:text-destructive after:ml-1">
                         Name of Report Encoder
-                      </FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="encoderPosition"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="after:content-['*'] after:text-destructive after:ml-1">
-                        Position
-                      </FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="encoderOffice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="after:content-['*'] after:text-destructive after:ml-1">
-                        Office
                       </FormLabel>
                       <FormControl>
                         <Input {...field} />
@@ -227,32 +173,124 @@ export default function AddCaseModal({ isOpen, onClose }: AddCaseModalProps) {
                     </FormItem>
                   )}
                 />
+                
+                <FormField
+                  control={form.control}
+                  name="victimAge"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Victim's Age
+                      </FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          {...field} 
+                          value={field.value === undefined ? '' : field.value} 
+                          onChange={(e) => field.onChange(e.target.value === '' ? undefined : parseInt(e.target.value))}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={form.control}
-                  name="barangay"
+                  name="victimGender"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="after:content-['*'] after:text-destructive after:ml-1">
-                        Barangay
+                      <FormLabel>
+                        Victim's Gender
                       </FormLabel>
                       <Select
                         onValueChange={field.onChange}
-                        defaultValue={field.value || "Poblacion"}
+                        defaultValue={field.value || ""}
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select Barangay" />
+                            <SelectValue placeholder="Select Gender" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="Poblacion">Poblacion</SelectItem>
-                          <SelectItem value="San Isidro">San Isidro</SelectItem>
-                          <SelectItem value="Santa Clara">Santa Clara</SelectItem>
-                          <SelectItem value="San Miguel">San Miguel</SelectItem>
-                          <SelectItem value="Malinta">Malinta</SelectItem>
+                          <SelectItem value="Female">Female</SelectItem>
+                          <SelectItem value="Male">Male</SelectItem>
+                          <SelectItem value="Other">Other</SelectItem>
                         </SelectContent>
                       </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="incidentDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="after:content-['*'] after:text-destructive after:ml-1">
+                        Incident Date
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          value={field.value instanceof Date 
+                            ? field.value.toISOString().split('T')[0]
+                            : ''}
+                          onChange={(e) => {
+                            const date = new Date(e.target.value);
+                            field.onChange(date);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="incidentType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="after:content-['*'] after:text-destructive after:ml-1">
+                        Incident Type
+                      </FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value || ""}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Incident Type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Physical abuse">Physical abuse</SelectItem>
+                          <SelectItem value="Verbal abuse">Verbal abuse</SelectItem>
+                          <SelectItem value="Economic abuse">Economic abuse</SelectItem>
+                          <SelectItem value="Sexual assault">Sexual assault</SelectItem>
+                          <SelectItem value="Workplace harassment">Workplace harassment</SelectItem>
+                          <SelectItem value="Child abuse">Child abuse</SelectItem>
+                          <SelectItem value="Other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="incidentLocation"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Incident Location
+                      </FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -265,6 +303,22 @@ export default function AddCaseModal({ isOpen, onClose }: AddCaseModalProps) {
                     <FormItem>
                       <FormLabel className="after:content-['*'] after:text-destructive after:ml-1">
                         Alleged Perpetrator's Name
+                      </FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="perpetratorRelationship"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Relationship to Victim
                       </FormLabel>
                       <FormControl>
                         <Input {...field} />
@@ -301,25 +355,30 @@ export default function AddCaseModal({ isOpen, onClose }: AddCaseModalProps) {
                     </FormItem>
                   )}
                 />
-
+                
                 <FormField
                   control={form.control}
-                  name="dateReported"
+                  name="priority"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="after:content-['*'] after:text-destructive after:ml-1">
-                        Date Reported
+                      <FormLabel>
+                        Priority
                       </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="date"
-                          value={field.value.split('T')[0]}
-                          onChange={(e) => {
-                            const date = new Date(e.target.value);
-                            field.onChange(date.toISOString());
-                          }}
-                        />
-                      </FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value || "Medium"}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Priority" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="High">High</SelectItem>
+                          <SelectItem value="Medium">Medium</SelectItem>
+                          <SelectItem value="Low">Low</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}

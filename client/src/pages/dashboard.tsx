@@ -151,9 +151,9 @@ export default function Dashboard() {
                 <table className="w-full">
                   <thead className="bg-muted/40">
                     <tr>
-                      <th className="text-sm font-medium text-left p-3">Date</th>
+                      <th className="text-sm font-medium text-left p-3">Incident Date</th>
                       <th className="text-sm font-medium text-left p-3">Victim's Name</th>
-                      <th className="text-sm font-medium text-left p-3">Barangay</th>
+                      <th className="text-sm font-medium text-left p-3">Location</th>
                       <th className="text-sm font-medium text-left p-3">Status</th>
                       <th className="text-sm font-medium text-left p-3">Actions</th>
                     </tr>
@@ -172,9 +172,9 @@ export default function Dashboard() {
                     ) : stats?.recentCases && stats.recentCases.length > 0 ? (
                       stats.recentCases.map((caseItem) => (
                         <tr key={caseItem.id}>
-                          <td className="p-3">{formatDate(new Date(caseItem.dateReported))}</td>
+                          <td className="p-3">{formatDate(new Date(caseItem.incidentDate))}</td>
                           <td className="p-3 font-medium">{caseItem.victimName}</td>
-                          <td className="p-3">{caseItem.barangay}</td>
+                          <td className="p-3">{caseItem.incidentLocation || 'Not specified'}</td>
                           <td className="p-3">
                             <StatusBadge status={caseItem.status} />
                           </td>
