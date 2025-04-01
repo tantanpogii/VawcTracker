@@ -58,7 +58,7 @@ export default function Reports() {
   const { toast } = useToast();
   const [reportType, setReportType] = useState("incident");
   const [timeframe, setTimeframe] = useState("all");
-  const [selectedBarangay, setSelectedBarangay] = useState<string | null>(null);
+  const [selectedBarangay, setSelectedBarangay] = useState<string>("all");
 
   // Fetch all cases for reports
   const { data: cases, isLoading, isError } = useQuery<Case[]>({
@@ -68,7 +68,7 @@ export default function Reports() {
   // Filtered cases based on selection
   const filteredCases = cases?.filter(caseItem => {
     // Filter by barangay if selected
-    if (selectedBarangay && caseItem.barangay !== selectedBarangay) {
+    if (selectedBarangay && selectedBarangay !== "all" && caseItem.barangay !== selectedBarangay) {
       return false;
     }
 
@@ -280,14 +280,14 @@ export default function Reports() {
             <div>
               <Label htmlFor="barangay">Barangay</Label>
               <Select 
-                value={selectedBarangay || ""} 
-                onValueChange={(value) => setSelectedBarangay(value || null)}
+                value={selectedBarangay} 
+                onValueChange={setSelectedBarangay}
               >
                 <SelectTrigger id="barangay" className="mt-1">
                   <SelectValue placeholder="All Barangays" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Barangays</SelectItem>
+                  <SelectItem value="all">All Barangays</SelectItem>
                   {barangayList.map(barangay => (
                     <SelectItem key={barangay} value={barangay}>
                       {barangay}
@@ -426,7 +426,7 @@ export default function Reports() {
               </ResponsiveContainer>
             </CardContent>
             <CardFooter className="text-sm text-muted-foreground">
-              {selectedBarangay ? `Filtered to ${selectedBarangay} barangay` : 'Showing all barangays'} |
+              {selectedBarangay !== "all" ? `Filtered to ${selectedBarangay} barangay` : 'Showing all barangays'} |
               {timeframe === "all" 
                 ? " All time" 
                 : timeframe === "month" 
