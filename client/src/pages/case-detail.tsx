@@ -29,6 +29,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import StatusBadge from "@/components/ui/status-badge";
 import DeleteConfirmationModal from "@/components/delete-confirmation-modal";
+import EditCaseModal from "@/components/edit-case-modal";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   ArrowLeft,
@@ -54,6 +55,7 @@ export default function CaseDetail({ id }: CaseDetailProps) {
   const { user } = useAuth();
   const [noteContent, setNoteContent] = useState("");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   // Fetch case details
   const { data: caseData, isLoading, isError } = useQuery<CaseWithDetails>({
@@ -194,7 +196,7 @@ export default function CaseDetail({ id }: CaseDetailProps) {
           <Button variant="outline" disabled>
             <Printer className="mr-2 h-4 w-4" /> Print
           </Button>
-          <Button variant="outline" onClick={() => setLocation(`/cases/${id}/edit`)}>
+          <Button variant="outline" onClick={() => setIsEditModalOpen(true)}>
             <Pencil className="mr-2 h-4 w-4" /> Edit
           </Button>
           <Button variant="outline" className="text-destructive hover:text-destructive" onClick={handleDeleteCase}>
@@ -392,27 +394,29 @@ export default function CaseDetail({ id }: CaseDetailProps) {
                   )}
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Position</p>
+                  <p className="text-sm text-muted-foreground mb-1">Date Created</p>
                   {isLoading ? (
                     <Skeleton className="h-6 w-40" />
                   ) : (
-                    <p className="font-medium">{caseData?.encoderPosition}</p>
+                    <p className="font-medium">{formatDate(new Date(caseData?.createdAt!))}</p>
                   )}
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Office</p>
+                  <p className="text-sm text-muted-foreground mb-1">Case Status</p>
                   {isLoading ? (
                     <Skeleton className="h-6 w-48" />
                   ) : (
-                    <p className="font-medium">{caseData?.encoderOffice}</p>
+                    <p className="font-medium">
+                      <StatusBadge status={caseData?.status!} size="md" />
+                    </p>
                   )}
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Entry Date</p>
+                  <p className="text-sm text-muted-foreground mb-1">Priority</p>
                   {isLoading ? (
                     <Skeleton className="h-6 w-32" />
                   ) : (
-                    <p className="font-medium">{formatDate(new Date(caseData?.entryDate!))}</p>
+                    <p className="font-medium">{caseData?.priority}</p>
                   )}
                 </div>
               </div>
@@ -494,6 +498,31 @@ export default function CaseDetail({ id }: CaseDetailProps) {
         onConfirm={confirmDelete}
         caseToDelete={caseData}
         isPending={deleteMutation.isPending}
+      />
+
+      {/* Edit Case Modal */}
+      <EditCaseModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        caseData={isLoading ? null : caseData ? {
+          id: caseData.id,
+          victimName: caseData.victimName,
+          victimAge: caseData.victimAge,
+          victimGender: caseData.victimGender,
+          barangay: caseData.barangay,
+          incidentDate: new Date(caseData.incidentDate),
+          incidentType: caseData.incidentType,
+          incidentLocation: caseData.incidentLocation,
+          perpetratorName: caseData.perpetratorName,
+          perpetratorRelationship: caseData.perpetratorRelationship,
+          status: caseData.status,
+          priority: caseData.priority,
+          encoderName: caseData.encoderName,
+          createdAt: new Date(caseData.createdAt),
+          services: [],
+          otherServices: "",
+          caseNotes: ""
+        } : null}
       />
     </div>
   );
