@@ -1,37 +1,32 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import * as schema from "@shared/schema";
-import { DBStorage } from "./db-storage";
-import ws from "ws";
+import { db } from './db';
+import { seedUsers } from './seed';
+import { Pool } from '@neondatabase/serverless';
 
-neonConfig.webSocketConstructor = ws;
-
-export async function setupDatabase() {
-  console.log("Setting up database...");
-
+export async function recreateDatabase() {
   try {
+    console.log("Recreating database tables...");
+    
     if (!process.env.DATABASE_URL) {
-      console.warn("DATABASE_URL not set, skipping database setup");
+      console.warn("DATABASE_URL not set, skipping database recreation");
       return false;
     }
 
-    // Create a client to connect
+    // Create a pool to connect
     const pool = new Pool({
       connectionString: process.env.DATABASE_URL,
     });
 
-    // Test connection
-    const client = await pool.connect();
-    console.log("Database connection successful");
-    client.release();
-
-    // Create database schema
-    const db = drizzle({ client: pool, schema });
-
-    // Push schema to database
-    console.log("Pushing schema to database...");
+    // Drop all tables first (in correct order due to foreign keys)
+    await pool.query(`
+      DROP TABLE IF EXISTS notes CASCADE;
+      DROP TABLE IF EXISTS services CASCADE;
+      DROP TABLE IF EXISTS cases CASCADE;
+      DROP TABLE IF EXISTS users CASCADE;
+    `);
     
-    // Execute SQL to create tables if not exist
+    console.log("Tables dropped successfully");
+
+    // Recreate tables with proper schema
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -50,6 +45,7 @@ export async function setupDatabase() {
         victim_name TEXT NOT NULL,
         victim_age INTEGER,
         victim_gender TEXT,
+        barangay TEXT,
         incident_date TIMESTAMP WITH TIME ZONE NOT NULL,
         incident_type TEXT NOT NULL,
         incident_location TEXT,
@@ -83,16 +79,15 @@ export async function setupDatabase() {
       );
     `);
     
-    console.log("Database tables created successfully");
+    console.log("Tables created successfully");
     
-    // Seed the database with initial data
-    const dbStorage = new DBStorage();
-    await dbStorage.seedDatabase();
-    console.log("Database seeded successfully");
+    // Seed with initial user data
+    await seedUsers();
     
+    console.log("Database recreated and seeded successfully");
     return true;
   } catch (error) {
-    console.error("Error setting up database:", error);
+    console.error("Error recreating database:", error);
     return false;
   }
 }

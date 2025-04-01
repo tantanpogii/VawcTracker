@@ -77,7 +77,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           username: user.username,
           fullName: user.fullName,
           position: user.position,
-          office: user.office
+          office: user.office,
+          role: user.role || 'editor'
         },
         JWT_SECRET,
         { expiresIn: "24h" }
@@ -87,7 +88,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       req.session.user = {
         id: user.id,
         username: user.username,
-        fullName: user.fullName
+        fullName: user.fullName,
+        role: user.role || 'editor'
       };
       
       // Return user info and token
@@ -97,7 +99,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           username: user.username,
           fullName: user.fullName,
           position: user.position,
-          office: user.office
+          office: user.office,
+          role: user.role || 'editor'
         },
         token
       });
@@ -133,7 +136,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         username: user.username,
         fullName: user.fullName,
         position: user.position,
-        office: user.office
+        office: user.office,
+        role: user.role || 'editor'
       });
       
     } catch (error) {

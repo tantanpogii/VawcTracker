@@ -67,7 +67,7 @@ export default function Login() {
               <ShieldAlert className="w-8 h-8" />
             </div>
             <h1 className="text-2xl font-bold mb-1">VAWC Case Management System</h1>
-            <p className="text-muted-foreground">Admin Login</p>
+            <p className="text-muted-foreground">Administrator or Editor Login</p>
           </div>
 
           {error && (
